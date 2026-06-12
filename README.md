@@ -13,7 +13,7 @@ Mobile-first HTML5 space game. Build a junky rocket, launch it through the atmos
 | Renderer | [PixiJS v8](https://pixijs.com) |
 | Build tool | [Vite](https://vitejs.dev) |
 | Runtime / package manager | [Bun](https://bun.sh) |
-| Database & auth | [Supabase](https://supabase.com) (username-only login) |
+| Database & auth | [Supabase](https://supabase.com) (email + password accounts, per-user RLS) |
 | Hosting | [Vercel](https://vercel.com) (auto-deploy on push to `main`) |
 
 ## Getting Started
@@ -34,28 +34,28 @@ VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-Without credentials the game runs in **local-only guest mode** (no cloud saves).
+Even with credentials, the **Play as Guest** button always lets anyone play (progress is stored locally, no cloud saves).
+
+## Auth model
+
+- Real **email + password** accounts via Supabase Auth — nothing faked.
+- A **callsign** (username) is chosen at sign-up and stored on the player row.
+- **Row-level security**: each player can read and write *only their own* row
+  (scoped by `auth.uid()`), so accounts have fully isolated history and data.
+- **Guest mode**: play instantly with no account; local-only progress.
 
 ## Database Setup (Supabase)
 
-Run this SQL in the Supabase SQL editor:
+Schema lives in `supabase/migrations/` and is applied with the Supabase CLI:
 
-```sql
-create table players (
-  id uuid default gen_random_uuid() primary key,
-  username text unique not null,
-  coins integer default 0,
-  best_altitude integer default 0,
-  upgrades jsonb default '{}',
-  created_at timestamptz default now(),
-  last_seen timestamptz default now()
-);
-
-alter table players enable row level security;
-create policy "public read" on players for select using (true);
-create policy "public insert" on players for insert with check (true);
-create policy "public update own" on players for update using (true);
+```bash
+make push          # bunx supabase db push
 ```
+
+This creates the `players` table (keyed to `auth.users` via `auth_user_id`),
+the per-user RLS policies, and a trigger that creates a player row on sign-up.
+If **Confirm email** is enabled in Supabase Auth, new pilots confirm via email
+before their first sign-in.
 
 ## Deployment
 

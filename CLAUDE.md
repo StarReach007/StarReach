@@ -11,7 +11,7 @@ Star Reach — mobile-first HTML5 space game with two linked parts: a rocket lau
 - **Runtime/PM:** Bun — use `bun install`, `bun run dev`, `bun run build` (never npm/yarn/pnpm)
 - **Build:** Vite (dev server + production build to `dist/`)
 - **Renderer:** PixiJS v8 — note v8 API: `new Text({ text, style })`, `graphics.rect().fill()`, `await app.init()`
-- **DB/Auth:** Supabase — username-only auth (no passwords/email), `players` table
+- **DB/Auth:** Supabase Auth — real email + password accounts + a callsign; per-user RLS on the `players` table (rows scoped by `auth.uid()`). Guest mode plays locally without an account.
 - **Deploy:** Vercel auto-deploys on push to `main`
 
 ```bash
@@ -25,7 +25,7 @@ bun run build      # production build → dist/
 Source lives in `js/` and `css/` (matches the Makefile lint targets); `index.html` at the repo root is the Vite entry point.
 
 - `js/main.js` — PixiJS Application init + screen routing (title ↔ game)
-- `js/auth.js` — `loginOrRegister(username)` / `autoLogin()` / `logout()` / `normalizeUsername()`. Username saved to localStorage key `starreach_user`. Falls back to local guest mode when Supabase env vars are missing.
+- `js/auth.js` — `register(email, username, password)` / `login(email, password)` / `continueAsGuest()` / `autoLogin()` / `logout()` / `normalizeUsername()`. Real Supabase Auth sessions; guest progress saved to localStorage key `starreach_guest`. `register()` returns `null` when email confirmation is pending.
 - `js/supabase.js` — client init from `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`; exports `null` when unconfigured
 - `js/screens/` — each screen exports `create<Name>Screen(app, ...)` returning a PixiJS `Container` (with an optional `.cleanup()` called on transition)
 - `css/style.css` — global + auth-overlay styles

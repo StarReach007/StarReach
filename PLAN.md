@@ -33,38 +33,43 @@ StarReach/
 
 ### Supabase — players table
 
+Schema lives in `supabase/migrations/` (applied via `make push`). The `players`
+row is keyed to `auth.users` through `auth_user_id`, and RLS scopes every
+read/write to the owner:
+
 ```sql
-create table players (
-  id uuid default gen_random_uuid() primary key,
-  username text unique not null,
-  coins integer default 0,
-  best_altitude integer default 0,
-  upgrades jsonb default '{}',
-  created_at timestamptz default now(),
-  last_seen timestamptz default now()
-);
-
-alter table players enable row level security;
-create policy "public read" on players for select using (true);
-create policy "public insert" on players for insert with check (true);
-create policy "public update own" on players for update using (true);
+create policy "read own"   on players for select using (auth_user_id = auth.uid());
+create policy "insert own" on players for insert with check (auth_user_id = auth.uid());
+create policy "update own" on players for update
+  using (auth_user_id = auth.uid()) with check (auth_user_id = auth.uid());
 ```
 
-### Auth flow (src/auth.js)
+A `SECURITY DEFINER` trigger on `auth.users` creates the player row at sign-up.
+See the migration for the full table + trigger definition.
+
+### Auth flow (js/auth.js)
+
+Real Supabase Auth — email + password, nothing faked.
 
 ```
-loginOrRegister(username):
-  1. Trim + lowercase + strip to [a-z0-9_], min 2 chars
-  2. SELECT from players WHERE username = input
-  3. Found  → update last_seen, return player row
-  4. Missing → INSERT new row, return new player
-  5. Save username to localStorage 'starreach_user'
+register(email, username, password):
+  - validate email / callsign (>=2, [a-z0-9_]) / password (>=6)
+  - supabase.auth.signUp({ email, password, data:{ username } })
+  - DB trigger creates the players row (auth_user_id = new user id)
+  - return player row, or null if email confirmation is pending
+
+login(email, password):
+  - supabase.auth.signInWithPassword → load own players row (RLS-scoped)
+
+continueAsGuest():
+  - local-only profile in localStorage 'starreach_guest' (no cloud saves)
 
 autoLogin():
-  Read localStorage → loginOrRegister(saved) → skip title form
+  - resume Supabase session if present, else saved guest, else null
 ```
 
-Falls back to **local guest mode** when Supabase env vars are missing.
+Anyone can play immediately via **Play as Guest**; cloud accounts are real
+email/password with per-user RLS (`auth_user_id = auth.uid()`).
 
 ### Title screen
 

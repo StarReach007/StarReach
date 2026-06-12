@@ -49,37 +49,60 @@ body {
   backdrop-filter: blur(8px);
 }
 
-#callsign-input {
+.auth-card input {
   padding: 14px 16px;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 17px;
   color: #e6f1ff;
   text-align: center;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   background: #0a1430;
   border: 1px solid #2a4d80;
   border-radius: 10px;
   outline: none;
 }
 
-#callsign-input:focus {
+.auth-card input:focus {
   border-color: #4f9bff;
 }
 
-#launch-button {
+#login-button,
+#register-button,
+#guest-button {
   padding: 14px 16px;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 1px;
-  color: #051026;
   cursor: pointer;
-  background: #4f9bff;
-  border: none;
   border-radius: 10px;
 }
 
-#launch-button:disabled {
+#login-button {
+  color: #051026;
+  background: #4f9bff;
+  border: none;
+}
+
+#register-button {
+  color: #9fc4ff;
+  background: transparent;
+  border: 1px solid #2a4d80;
+}
+
+#guest-button {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #6f8bb5;
+  background: transparent;
+  border: none;
+}
+
+#login-button:disabled,
+#register-button:disabled,
+#guest-button:disabled {
   cursor: default;
   opacity: 0.5;
 }

@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js'
-import { loginOrRegister } from '../auth.js'
+import { continueAsGuest, login, register } from '../auth.js'
 
 /**
  * Title screen: animated starfield + glowing title. The callsign form is the
@@ -70,34 +70,61 @@ export function createTitleScreen(app, { overlay, onLaunch }) {
 
   // --- HTML overlay wiring ---
   overlay.classList.add('visible')
-  const input = overlay.querySelector('#callsign-input')
-  const button = overlay.querySelector('#launch-button')
+  const emailInput = overlay.querySelector('#email-input')
+  const userInput = overlay.querySelector('#callsign-input')
+  const pwInput = overlay.querySelector('#password-input')
+  const loginBtn = overlay.querySelector('#login-button')
+  const registerBtn = overlay.querySelector('#register-button')
+  const guestBtn = overlay.querySelector('#guest-button')
   const status = overlay.querySelector('#auth-status')
+  const buttons = [loginBtn, registerBtn, guestBtn]
 
-  const launch = async () => {
-    button.disabled = true
-    status.textContent = ''
+  const setBusy = (busy) => buttons.forEach((b) => (b.disabled = busy))
+  const setStatus = (msg, ok = false) => {
+    status.textContent = msg
+    status.style.color = ok ? '#7ed9a0' : '#ff8080'
+  }
+
+  // Runs an auth action; a null result means "account created, confirm email".
+  const run = async (action) => {
+    setBusy(true)
+    setStatus('')
     try {
-      const player = await loginOrRegister(input.value)
-      onLaunch(player)
+      const player = await action()
+      if (player) onLaunch(player)
+      else {
+        setStatus('Account created — check your email to confirm, then log in.', true)
+        setBusy(false)
+      }
     } catch (err) {
-      status.textContent = err.message || 'Login failed.'
-      button.disabled = false
+      setStatus(err.message || 'Something went wrong.')
+      setBusy(false)
     }
   }
 
+  const onLogin = () => run(() => login(emailInput.value, pwInput.value))
+  const onRegister = () =>
+    run(() => register(emailInput.value, userInput.value, pwInput.value))
+  const onGuest = () => run(() => continueAsGuest())
   const onKey = (e) => {
-    if (e.key === 'Enter') launch()
+    if (e.key === 'Enter') onLogin()
   }
-  button.addEventListener('click', launch)
-  input.addEventListener('keydown', onKey)
-  setTimeout(() => input.focus(), 0)
+
+  loginBtn.addEventListener('click', onLogin)
+  registerBtn.addEventListener('click', onRegister)
+  guestBtn.addEventListener('click', onGuest)
+  emailInput.addEventListener('keydown', onKey)
+  pwInput.addEventListener('keydown', onKey)
+  setTimeout(() => emailInput.focus(), 0)
 
   // Called by main.show() before this screen is destroyed.
   screen.cleanup = () => {
     app.ticker.remove(tick)
-    button.removeEventListener('click', launch)
-    input.removeEventListener('keydown', onKey)
+    loginBtn.removeEventListener('click', onLogin)
+    registerBtn.removeEventListener('click', onRegister)
+    guestBtn.removeEventListener('click', onGuest)
+    emailInput.removeEventListener('keydown', onKey)
+    pwInput.removeEventListener('keydown', onKey)
     overlay.classList.remove('visible')
   }
 

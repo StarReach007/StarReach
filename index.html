@@ -16,15 +16,31 @@
     <div id="auth-overlay">
       <div class="auth-card">
         <input
+          id="email-input"
+          type="email"
+          autocomplete="email"
+          autocapitalize="off"
+          spellcheck="false"
+          placeholder="email"
+        />
+        <input
           id="callsign-input"
           type="text"
-          autocomplete="off"
+          autocomplete="username"
           autocapitalize="off"
           spellcheck="false"
           maxlength="20"
-          placeholder="callsign"
+          placeholder="callsign (new pilots)"
         />
-        <button id="launch-button" type="button">LAUNCH</button>
+        <input
+          id="password-input"
+          type="password"
+          autocomplete="current-password"
+          placeholder="password"
+        />
+        <button id="login-button" type="button">LOG IN</button>
+        <button id="register-button" type="button">CREATE ACCOUNT</button>
+        <button id="guest-button" type="button">PLAY AS GUEST</button>
         <p id="auth-status"></p>
       </div>
     </div>
