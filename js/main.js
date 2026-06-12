@@ -1,4 +1,5 @@
 import { Application } from 'pixi.js'
+import { playIntro } from './intro.js'
 import { autoLogin } from './auth.js'
 import { createTitleScreen } from './screens/titleScreen.js'
 import { createGameScreen } from './screens/gameScreen.js'
@@ -29,17 +30,24 @@ function goToTitle() {
 }
 
 async function boot() {
-  await app.init({
-    background: '#05060f',
-    resizeTo: window,
-    antialias: true,
-    autoDensity: true,
-    resolution: window.devicePixelRatio || 1,
-  })
-  document.getElementById('app').appendChild(app.canvas)
+  // Pixi + session resume load behind the intro video, so the wait is hidden.
+  const ready = Promise.all([
+    app
+      .init({
+        background: '#05060f',
+        resizeTo: window,
+        antialias: true,
+        autoDensity: true,
+        resolution: window.devicePixelRatio || 1,
+      })
+      .then(() => document.getElementById('app').appendChild(app.canvas)),
+    autoLogin(),
+  ])
+
+  await playIntro()
 
   // Returning player? Skip the title form and drop straight into the game.
-  const player = await autoLogin()
+  const [, player] = await ready
   if (player) goToGame(player)
   else goToTitle()
 }
