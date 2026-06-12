@@ -69,15 +69,17 @@ Every push to `main` auto-deploys via Vercel. One-time setup:
 ## Project Structure
 
 ```
-├── index.html               # Entry point + auth overlay UI
-├── src/
+├── index.html               # Vite entry point + HTML auth overlay
+├── js/
 │   ├── main.js              # PixiJS app init + screen router
-│   ├── supabase.js          # Supabase client
-│   ├── auth.js              # Username-only login/register
+│   ├── supabase.js          # Supabase client (null when unconfigured)
+│   ├── auth.js              # Username-only login/register + normalize
 │   └── screens/
-│       ├── titleScreen.js   # Animated title + callsign entry
+│       ├── titleScreen.js   # Animated starfield + callsign entry
 │       └── gameScreen.js    # Game placeholder (rocket game lands here)
-├── public/assets/           # Game art (PNG)
+├── css/style.css            # Global + auth-overlay styles
+├── supabase/migrations/     # DB schema (applied via `make push`)
+├── Makefile                 # dev / install / lint / db push targets
 ├── vercel.json              # Vercel build config
 └── vite.config.js           # Vite config
 ```

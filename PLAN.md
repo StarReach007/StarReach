@@ -82,11 +82,15 @@ Falls back to **local guest mode** when Supabase env vars are missing.
   GRAVITY 0.028 · COAST_DRAG 0.9985 · MAX_THRUST 0.042 · rotation steering (no auto-center, full 360°) · landing thresholds vy > 3.5 explode / 1.5–3.5 damage / < 1.5 safe
 - Game loop: `app.ticker.add(delta => update(delta))`
 
-## Phase 3: Port mining game + link both games
+## Phase 3: Moon arrival → mining → colony
 
-- Shared wallet via Supabase `players.coins`
-- Navigation between the two games
-- Upgrades synced to `players.upgrades` (jsonb)
+Story: reach the Moon, mine its resources, and spend them to **build a colony** that
+funds better rockets and farther worlds (Mars → Europa → Titan).
+
+- Moon arrival screen → resource mining minigame
+- Colony builder funded by mined resources
+- Shared wallet via Supabase `players.coins`; upgrades synced to `players.upgrades` (jsonb)
+- Navigation between launch, mining, and colony views
 
 ---
 
@@ -102,9 +106,15 @@ Falls back to **local guest mode** when Supabase env vars are missing.
 
 ## Verification checklist
 
-- [ ] `bun install` → no errors
-- [ ] `bun run dev` → title screen renders (starfield + callsign input)
-- [ ] Enter username → row appears in Supabase `players` table
-- [ ] Refresh → auto-login skips title screen
-- [ ] Same username on another browser → loads same player
+- [x] `bun install` → no errors (pixi.js 8.19, vite 6.4, supabase 2.108)
+- [x] `bun run build` → 763 modules bundled to `dist/`
+- [x] `bun run dev` → server boots; index.html / js / css all serve HTTP 200
+- [ ] Enter username → row appears in Supabase `players` table *(needs .env creds)*
+- [ ] Refresh → auto-login skips title screen *(needs .env creds)*
+- [ ] Same username on another browser → loads same player *(needs .env creds)*
 - [ ] Push to `main` → Vercel builds and serves live URL
+
+> **Note:** Phase 1 structure was implemented into `js/` + `css/` + root `index.html`
+> (matching the Makefile lint targets), not the `src/` tree shown above. The original
+> single-file canvas prototype that previously occupied `index.html` was replaced by
+> this scaffold and lives in git history (`git show HEAD:index.html`).

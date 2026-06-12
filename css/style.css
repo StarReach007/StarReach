@@ -1,0 +1,93 @@
+/* Star Reach — global + auth overlay styles. Mobile-first. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #05060f;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app,
+#app canvas {
+  display: block;
+}
+
+/* Auth overlay sits above the PixiJS canvas (z-index) and only the card
+   captures pointer events, so the starfield behind it stays interactive. */
+#auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#auth-overlay.visible {
+  display: flex;
+}
+
+.auth-card {
+  pointer-events: auto;
+  width: min(420px, 90vw);
+  margin-bottom: max(8vh, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: rgb(10 16 34 / 85%);
+  border: 1px solid #1f3b66;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+#callsign-input {
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 18px;
+  color: #e6f1ff;
+  text-align: center;
+  letter-spacing: 2px;
+  background: #0a1430;
+  border: 1px solid #2a4d80;
+  border-radius: 10px;
+  outline: none;
+}
+
+#callsign-input:focus {
+  border-color: #4f9bff;
+}
+
+#launch-button {
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #051026;
+  cursor: pointer;
+  background: #4f9bff;
+  border: none;
+  border-radius: 10px;
+}
+
+#launch-button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+#auth-status {
+  min-height: 18px;
+  margin: 0;
+  font-size: 13px;
+  color: #ff8080;
+  text-align: center;
+}
