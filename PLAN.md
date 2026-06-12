@@ -79,23 +79,46 @@ email/password with per-user RLS (`auth_user_id = auth.uid()`).
 
 ---
 
-## Phase 2: Port rocket game to PixiJS
+## Direction (v2): Red Alert-style space colonization
 
-- Replace `canvas.getContext('2d')` with PixiJS `Application`
-- `ctx.drawImage` → `Sprite`, `ctx.fillRect` → `Graphics`
-- Keep all physics, collision, and upgrade logic **unchanged**:
+> Full design: `docs/superpowers/specs/2026-06-13-starreach-v2-direction.md`
+
+2D **isometric RTS-style base building** connected by the playable rocket
+flight game. Core loop: **build → harvest → launch → fly → land → build
+again**. Conquest in v1 = colonizing Moon → Mars → Europa → Titan (economy
+first; combat is a later phase).
+
+## Phase 2: Intro FMV ✅
+
+Tap-to-start gate (unlocks audio) → landing video full-screen with sound,
+tap to skip → normal boot. `js/intro.js` + `public/assets/intro.mp4`.
+
+## Phase 3: Isometric base MVP on the Moon
+
+- Iso tile grid renderer + depth sorting (iso math isolated in one module)
+- Pinch/drag camera; tap-to-place buildings; ore patches; harvest-tick economy
+- RA-style build sidebar (PixiJS)
+- Four structures: Landing Site (HQ), Power Plant, Ore Refinery, Rocket Pad
+- Base state persisted per planet (Supabase for accounts, localStorage for guests)
+
+## Phase 4: Rocket flight port (travel layer)
+
+- Port the legacy canvas prototype to PixiJS, physics **unchanged**:
   GRAVITY 0.028 · COAST_DRAG 0.9985 · MAX_THRUST 0.042 · rotation steering (no auto-center, full 360°) · landing thresholds vy > 3.5 explode / 1.5–3.5 damage / < 1.5 safe
-- Game loop: `app.ticker.add(delta => update(delta))`
+- Framed as travel between planets: landing quality determines surviving cargo
 
-## Phase 3: Moon arrival → mining → colony
+## Phase 5: Star chart
 
-Story: reach the Moon, mine its resources, and spend them to **build a colony** that
-funds better rockets and farther worlds (Mars → Europa → Titan).
+Planet-selection map stitching bases + flights into one campaign.
 
-- Moon arrival screen → resource mining minigame
-- Colony builder funded by mined resources
-- Shared wallet via Supabase `players.coins`; upgrades synced to `players.upgrades` (jsonb)
-- Navigation between launch, mining, and colony views
+## Phase 6: RA-style UI skin + PixiJS auth modal
+
+Military-console aesthetic; replaces the HTML auth card with a full-PixiJS
+modal (hidden DOM input only as keyboard conduit).
+
+## Later: combat
+
+AI defenders on contested planets first; PvP only after that, if ever.
 
 ---
 

@@ -4,7 +4,7 @@ Guidance for Claude Code when working in this repository.
 
 ## Project
 
-Star Reach — mobile-first HTML5 space game with two linked parts: a rocket launch/flight game and a planet mining game. Players launch rockets, reach planets (Moon → Mars → Europa → Titan), mine resources, and buy upgrades.
+Star Reach — mobile-first HTML5 space game: **Red Alert-style isometric base building** connected by a skill-based rocket flight game. Players build a base, harvest ore, construct a rocket, fly it themselves to the next planet (Moon → Mars → Europa → Titan), and colonize space. Economy first; combat is a later phase. Direction spec: `docs/superpowers/specs/2026-06-13-starreach-v2-direction.md`.
 
 ## Stack & Commands
 
@@ -24,7 +24,8 @@ bun run build      # production build → dist/
 
 Source lives in `js/` and `css/` (matches the Makefile lint targets); `index.html` at the repo root is the Vite entry point.
 
-- `js/main.js` — PixiJS Application init + screen routing (title ↔ game)
+- `js/main.js` — PixiJS Application init + screen routing (title ↔ game); boots Pixi + session resume behind the intro video
+- `js/intro.js` — boot-time intro: TAP TO START gate (unlocks audio) → landing video (`public/assets/intro.mp4`) with sound, tap to skip
 - `js/auth.js` — `register(email, username, password)` / `login(email, password)` / `continueAsGuest()` / `autoLogin()` / `logout()` / `normalizeUsername()`. Real Supabase Auth sessions; guest progress saved to localStorage key `starreach_guest`. `register()` returns `null` when email confirmation is pending.
 - `js/supabase.js` — client init from `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`; exports `null` when unconfigured
 - `js/screens/` — each screen exports `create<Name>Screen(app, ...)` returning a PixiJS `Container` (with an optional `.cleanup()` called on transition)
@@ -48,12 +49,13 @@ The original single-file canvas prototype (~2,927-line `index.html`) was removed
 
 ## Story
 
-Launch a junky rocket from Earth, fly through the atmosphere, and **reach the Moon**. On arrival, mine its resources and spend them to **build a colony**, funding better rockets and reaching farther worlds (Mars → Europa → Titan).
+Launch from Earth in a junky rocket and **conquer space, Red Alert-style**: land on the Moon, build a base from your landing craft, harvest ore, and construct better rockets — then fly them yourself to farther worlds (Mars → Europa → Titan), founding a colony on each. (Narrative beats live in `StoryBoard.md`.)
 
-## Roadmap
+## Roadmap (v2 — see PLAN.md for detail)
 
-1. Port rocket game to PixiJS (keep physics identical)
-2. Moon arrival → resource mining
-3. Colony builder funded by mined resources
-4. Shared wallet via Supabase `players.coins`
-5. Tier-based rocket art, landing sequences, sounds
+1. ✅ Intro FMV (tap-to-start gate → landing video)
+2. Isometric base MVP on the Moon (4 structures, harvest economy, RA-style build sidebar)
+3. Rocket flight port (physics identical) as the travel layer
+4. Star chart connecting planets
+5. RA-style UI skin + full-PixiJS auth modal
+6. Later: AI defenders, then maybe PvP
