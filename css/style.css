@@ -66,9 +66,21 @@ body {
   border-color: #4f9bff;
 }
 
+.auth-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-view[hidden] {
+  display: none;
+}
+
 #login-button,
 #register-button,
-#guest-button {
+#try-button,
+#join-button,
+#back-button {
   padding: 14px 16px;
   font-family: inherit;
   font-size: 16px;
@@ -78,19 +90,21 @@ body {
   border-radius: 10px;
 }
 
-#login-button {
+#login-button,
+#try-button {
   color: #051026;
   background: #4f9bff;
   border: none;
 }
 
-#register-button {
+#register-button,
+#join-button {
   color: #9fc4ff;
   background: transparent;
   border: 1px solid #2a4d80;
 }
 
-#guest-button {
+#back-button {
   margin-top: 4px;
   font-size: 13px;
   font-weight: 400;
@@ -102,7 +116,9 @@ body {
 
 #login-button:disabled,
 #register-button:disabled,
-#guest-button:disabled {
+#try-button:disabled,
+#join-button:disabled,
+#back-button:disabled {
   cursor: default;
   opacity: 0.5;
 }
@@ -148,6 +164,18 @@ body {
   font-size: 12px;
   color: #6f8bb5;
   animation: none;
+}
+
+.intro-denied {
+  margin: 0;
+  padding: 0 24px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #ff4040;
+  text-align: center;
+  text-shadow: 0 0 18px rgb(255 64 64 / 60%);
+  animation: intro-blink 1.2s step-end infinite;
 }
 
 @keyframes intro-blink {

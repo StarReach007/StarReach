@@ -20,32 +20,39 @@
     <!-- Auth overlay: PixiJS has no native text input, so the callsign form is plain HTML layered above the canvas. -->
     <div id="auth-overlay">
       <div class="auth-card">
-        <input
-          id="email-input"
-          type="email"
-          autocomplete="email"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="email"
-        />
-        <input
-          id="callsign-input"
-          type="text"
-          autocomplete="username"
-          autocapitalize="off"
-          spellcheck="false"
-          maxlength="20"
-          placeholder="callsign (new pilots)"
-        />
-        <input
-          id="password-input"
-          type="password"
-          autocomplete="current-password"
-          placeholder="password"
-        />
-        <button id="login-button" type="button">LOG IN</button>
-        <button id="register-button" type="button">CREATE ACCOUNT</button>
-        <button id="guest-button" type="button">PLAY AS GUEST</button>
+        <!-- First menu: two choices only. Login/Join reveals the form below. -->
+        <div id="menu-view" class="auth-view">
+          <button id="try-button" type="button">TRY THE GAME</button>
+          <button id="join-button" type="button">LOGIN / JOIN</button>
+        </div>
+        <div id="login-view" class="auth-view" hidden>
+          <input
+            id="email-input"
+            type="email"
+            autocomplete="email"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="email"
+          />
+          <input
+            id="callsign-input"
+            type="text"
+            autocomplete="username"
+            autocapitalize="off"
+            spellcheck="false"
+            maxlength="20"
+            placeholder="callsign (new pilots)"
+          />
+          <input
+            id="password-input"
+            type="password"
+            autocomplete="current-password"
+            placeholder="password"
+          />
+          <button id="login-button" type="button">LOG IN</button>
+          <button id="register-button" type="button">CREATE ACCOUNT</button>
+          <button id="back-button" type="button">BACK</button>
+        </div>
         <p id="auth-status"></p>
       </div>
     </div>

@@ -2,8 +2,9 @@ import { Container, Graphics, Text } from 'pixi.js'
 import { continueAsGuest, login, register } from '../auth.js'
 
 /**
- * Title screen: animated starfield + glowing title. The callsign form is the
- * HTML overlay (passed in); this wires its LAUNCH button to the auth flow.
+ * Title screen: animated starfield + glowing title. The HTML overlay (passed
+ * in) starts on a two-button menu (TRY THE GAME / LOGIN-JOIN); the email +
+ * password form is revealed behind LOGIN / JOIN.
  *
  * @param {import('pixi.js').Application} app
  * @param {{ overlay: HTMLElement, onLaunch: (player: object) => void }} opts
@@ -70,14 +71,18 @@ export function createTitleScreen(app, { overlay, onLaunch }) {
 
   // --- HTML overlay wiring ---
   overlay.classList.add('visible')
+  const menuView = overlay.querySelector('#menu-view')
+  const loginView = overlay.querySelector('#login-view')
   const emailInput = overlay.querySelector('#email-input')
   const userInput = overlay.querySelector('#callsign-input')
   const pwInput = overlay.querySelector('#password-input')
+  const tryBtn = overlay.querySelector('#try-button')
+  const joinBtn = overlay.querySelector('#join-button')
   const loginBtn = overlay.querySelector('#login-button')
   const registerBtn = overlay.querySelector('#register-button')
-  const guestBtn = overlay.querySelector('#guest-button')
+  const backBtn = overlay.querySelector('#back-button')
   const status = overlay.querySelector('#auth-status')
-  const buttons = [loginBtn, registerBtn, guestBtn]
+  const buttons = [tryBtn, joinBtn, loginBtn, registerBtn, backBtn]
 
   const setBusy = (busy) => buttons.forEach((b) => (b.disabled = busy))
   const setStatus = (msg, ok = false) => {
@@ -102,29 +107,44 @@ export function createTitleScreen(app, { overlay, onLaunch }) {
     }
   }
 
+  // Two-view card: the menu (TRY THE GAME / LOGIN-JOIN) is the front door;
+  // the email/password form only appears behind LOGIN / JOIN.
+  const showLoginView = (show) => {
+    menuView.hidden = show
+    loginView.hidden = !show
+    setStatus('')
+    if (show) setTimeout(() => emailInput.focus(), 0)
+  }
+
   const onLogin = () => run(() => login(emailInput.value, pwInput.value))
   const onRegister = () =>
     run(() => register(emailInput.value, userInput.value, pwInput.value))
-  const onGuest = () => run(() => continueAsGuest())
+  const onTry = () => run(() => continueAsGuest())
+  const onJoin = () => showLoginView(true)
+  const onBack = () => showLoginView(false)
   const onKey = (e) => {
     if (e.key === 'Enter') onLogin()
   }
 
+  tryBtn.addEventListener('click', onTry)
+  joinBtn.addEventListener('click', onJoin)
   loginBtn.addEventListener('click', onLogin)
   registerBtn.addEventListener('click', onRegister)
-  guestBtn.addEventListener('click', onGuest)
+  backBtn.addEventListener('click', onBack)
   emailInput.addEventListener('keydown', onKey)
   pwInput.addEventListener('keydown', onKey)
-  setTimeout(() => emailInput.focus(), 0)
 
   // Called by main.show() before this screen is destroyed.
   screen.cleanup = () => {
     app.ticker.remove(tick)
+    tryBtn.removeEventListener('click', onTry)
+    joinBtn.removeEventListener('click', onJoin)
     loginBtn.removeEventListener('click', onLogin)
     registerBtn.removeEventListener('click', onRegister)
-    guestBtn.removeEventListener('click', onGuest)
+    backBtn.removeEventListener('click', onBack)
     emailInput.removeEventListener('keydown', onKey)
     pwInput.removeEventListener('keydown', onKey)
+    showLoginView(false) // next visit starts on the menu
     overlay.classList.remove('visible')
   }
 
